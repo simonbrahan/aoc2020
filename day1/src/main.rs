@@ -10,15 +10,23 @@ fn main() -> Result<(), Error> {
 
 fn solve_part1(mut input: Vec<usize>) -> usize {
     input.sort_unstable();
-    product_of_summing_double(&input, 2020)
+    product_of_summing_double(&input, 2020).expect("No pair of inputs sums to 2020")
 }
 
 fn solve_part2(mut input: Vec<usize>) -> usize {
     input.sort_unstable();
-    241861950
+
+    for (idx, num) in input.iter().enumerate() {
+        match product_of_summing_double(&input[idx..], 2020 - num) {
+            Some(sum_of_double) => return sum_of_double * num,
+            None => continue
+        }
+    }
+
+    panic!("No triplet of inputs sums to 2020");
 }
 
-fn product_of_summing_double(input: &[usize], sum: usize) -> usize {
+fn product_of_summing_double(input: &[usize], sum: usize) -> Option<usize> {
     let mut low_idx = 0;
     let mut high_idx = input.len() - 1;
 
@@ -28,9 +36,13 @@ fn product_of_summing_double(input: &[usize], sum: usize) -> usize {
         } else {
             high_idx -= 1;
         }
+
+        if low_idx >= high_idx {
+            return None;
+        }
     }
 
-    input[low_idx] * input[high_idx]
+    Some(input[low_idx] * input[high_idx])
 }
 
 fn read_input<R: Read>(io: R) -> Result<Vec<usize>, Error> {
