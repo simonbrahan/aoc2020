@@ -1,5 +1,10 @@
-fn main() {
-    println!("Hello, world!");
+use std::fs::File;
+use std::io::{BufRead, BufReader, Error, ErrorKind, Read};
+
+fn main() -> Result<(), Error> {
+    let input = read_input(File::open("input.txt")?)?;
+    println!("{}", solve(input));
+    Ok(())
 }
 
 fn solve(mut input: Vec<usize>) -> usize {
@@ -17,6 +22,13 @@ fn solve(mut input: Vec<usize>) -> usize {
     }
 
     input[low_idx] * input[high_idx]
+}
+
+fn read_input<R: Read>(io: R) -> Result<Vec<usize>, Error> {
+    let br = BufReader::new(io);
+    br.lines()
+        .map(|line| line.and_then(|v| v.parse().map_err(|e| Error::new(ErrorKind::InvalidData, e))))
+        .collect()
 }
 
 #[cfg(test)]
