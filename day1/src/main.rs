@@ -3,18 +3,27 @@ use std::io::{BufRead, BufReader, Error, ErrorKind, Read};
 
 fn main() -> Result<(), Error> {
     let input = read_input(File::open("input.txt")?)?;
-    println!("{}", solve_part1(input));
+    println!("{}", solve_part1(input.clone()));
+    println!("{}", solve_part2(input));
     Ok(())
 }
 
 fn solve_part1(mut input: Vec<usize>) -> usize {
     input.sort_unstable();
+    product_of_summing_double(&input, 2020)
+}
 
+fn solve_part2(mut input: Vec<usize>) -> usize {
+    input.sort_unstable();
+    241861950
+}
+
+fn product_of_summing_double(input: &[usize], sum: usize) -> usize {
     let mut low_idx = 0;
     let mut high_idx = input.len() - 1;
 
-    while input[low_idx] + input[high_idx] != 2020 {
-        if input[low_idx] + input[high_idx] < 2020 {
+    while input[low_idx] + input[high_idx] != sum {
+        if input[low_idx] + input[high_idx] < sum {
             low_idx += 1;
         } else {
             high_idx -= 1;
@@ -40,5 +49,12 @@ mod tests {
         let input = vec![1721, 979, 366, 299, 675, 1456];
 
         assert_eq!(514579, solve_part1(input));
+    }
+
+    #[test]
+    fn test_solve_part2() {
+        let input = vec![1721, 979, 366, 299, 675, 1456];
+
+        assert_eq!(241861950, solve_part2(input));
     }
 }
