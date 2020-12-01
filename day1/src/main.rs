@@ -3,11 +3,11 @@ use std::io::{BufRead, BufReader, Error, ErrorKind, Read};
 
 fn main() -> Result<(), Error> {
     let input = read_input(File::open("input.txt")?)?;
-    println!("{}", solve(input));
+    println!("{}", solve_part1(input));
     Ok(())
 }
 
-fn solve(mut input: Vec<usize>) -> usize {
+fn solve_part1(mut input: Vec<usize>) -> usize {
     input.sort_unstable();
 
     let mut low_idx = 0;
@@ -36,9 +36,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_solve() {
+    fn test_solve_part1() {
         let input = vec![1721, 979, 366, 299, 675, 1456];
 
-        assert_eq!(514579, solve(input));
+        assert_eq!(514579, solve_part1(input));
     }
 }
