@@ -1,7 +1,7 @@
 use std::fs::File;
-use std::io::{BufRead, BufReader, Error, ErrorKind, Read};
+use std::io::{BufRead, BufReader, Error};
 
-type PasswordDeclaration<'a> = (usize, usize, char, &'a str);
+type PasswordDeclaration = (usize, usize, char, String);
 
 fn main() -> Result<(), Error> {
     println!("{}", solve_part1(read_input()?));
@@ -21,12 +21,31 @@ fn solve_part1(input: Vec<PasswordDeclaration>) -> usize {
     out
 }
 
-fn read_input() -> Result<Vec<PasswordDeclaration<'static>>, Error> {
-    Ok(vec![
-        (1, 3, 'a', "abcde"),
-        (1, 3, 'b', "cdefg"),
-        (2, 9, 'c', "ccccccccc")
-    ])
+fn read_input() -> Result<Vec<PasswordDeclaration>, Error> {
+    let input = File::open("input.txt")?;
+    let br = BufReader::new(input);
+
+    let mut out = vec![];
+    for line in br.lines() {
+        if let Ok(entry) = line {
+            let parts: Vec<&str> = entry.split(' ').collect();
+
+            let bounds: Vec<usize> = parts[0]
+                .split('-')
+                .map(|num| num.parse::<usize>().expect("bounds should be integers"))
+                .collect();
+            let min = bounds[0];
+            let max = bounds[1];
+
+            let find = parts[1].chars().next().unwrap();
+
+            let candidate = parts[2].to_string();
+
+            out.push((min, max, find, candidate));
+        }
+    }
+
+    Ok(out)
 }
 
 #[cfg(test)]
@@ -36,9 +55,9 @@ mod tests {
     #[test]
     fn test_solve_part1() {
         let input = vec![
-            (1, 3, 'a', "abcde"),
-            (1, 3, 'b', "cdefg"),
-            (2, 9, 'c', "ccccccccc")
+            (1, 3, 'a', "abcde".to_string()),
+            (1, 3, 'b', "cdefg".to_string()),
+            (2, 9, 'c', "ccccccccc".to_string()),
         ];
 
         assert_eq!(2, solve_part1(input));
