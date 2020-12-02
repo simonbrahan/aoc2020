@@ -5,6 +5,7 @@ type PasswordDeclaration = (usize, usize, char, String);
 
 fn main() -> Result<(), Error> {
     println!("{}", solve_part1(read_input()?));
+    println!("{}", solve_part2(read_input()?));
     Ok(())
 }
 
@@ -14,6 +15,21 @@ fn solve_part1(input: Vec<PasswordDeclaration>) -> usize {
     for (min, max, find, candidate) in input {
         let matched_chars = candidate.matches(find).count();
         if matched_chars >= min && matched_chars <= max {
+            out += 1;
+        }
+    }
+
+    out
+}
+
+fn solve_part2(input: Vec<PasswordDeclaration>) -> usize {
+    let mut out = 0;
+
+    for (pos1, pos2, find, candidate) in input {
+        let pos1_matches = candidate.chars().nth(pos1 - 1).map_or(false, |c| c == find);
+        let pos2_matches = candidate.chars().nth(pos2 - 1).map_or(false, |c| c == find);
+
+        if pos1_matches ^ pos2_matches {
             out += 1;
         }
     }
@@ -61,5 +77,16 @@ mod tests {
         ];
 
         assert_eq!(2, solve_part1(input));
+    }
+
+    #[test]
+    fn test_solve_part2() {
+        let input = vec![
+            (1, 3, 'a', "abcde".to_string()),
+            (1, 3, 'b', "cdefg".to_string()),
+            (2, 9, 'c', "ccccccccc".to_string()),
+        ];
+
+        assert_eq!(1, solve_part2(input));
     }
 }
