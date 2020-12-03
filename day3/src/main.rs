@@ -23,11 +23,28 @@ impl Slope {
 
 fn main() -> Result<(), Error> {
     let slope = read_input()?;
-    println!("{}", solve_part1(slope, 3, 1));
+    println!("{}", solve_part1(&slope));
+    println!("{}", solve_part2(&slope));
+
     Ok(())
 }
 
-fn solve_part1(slope: Slope, speed_right: usize, speed_down: usize) -> usize {
+fn solve_part1(slope: &Slope) -> usize {
+    solve_for_path(slope, 3, 1)
+}
+
+fn solve_part2(slope: &Slope) -> usize {
+    let paths = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
+    let mut out = 1;
+
+    for (speed_right, speed_down) in paths {
+        out *= solve_for_path(slope, speed_right, speed_down);
+    }
+
+    out
+}
+
+fn solve_for_path(slope: &Slope, speed_right: usize, speed_down: usize) -> usize {
     let mut pos = (0, 0);
     let mut out = 0;
 
