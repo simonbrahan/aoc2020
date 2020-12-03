@@ -1,11 +1,13 @@
 use std::collections::HashSet;
+use std::fs::File;
+use std::io::{BufRead, BufReader, Error};
 
 type Point = (usize, usize);
 
 struct Slope {
     trees: HashSet<Point>,
     length: usize,
-    repeat_at: usize
+    repeat_at: usize,
 }
 
 impl Slope {
@@ -19,8 +21,10 @@ impl Slope {
     }
 }
 
-fn main() {
-    println!("Hello, world!");
+fn main() -> Result<(), Error> {
+    let slope = read_input()?;
+    println!("{}", solve_part1(slope, 3, 1));
+    Ok(())
 }
 
 fn solve_part1(slope: Slope, speed_right: usize, speed_down: usize) -> usize {
@@ -37,6 +41,33 @@ fn solve_part1(slope: Slope, speed_right: usize, speed_down: usize) -> usize {
     }
 
     out
+}
+
+fn read_input() -> Result<Slope, Error> {
+    let input = File::open("input.txt")?;
+    let br = BufReader::new(input);
+
+    let mut trees = vec![];
+    for (y, line) in br.lines().enumerate() {
+        if let Ok(row) = line {
+            for (x, cell) in row.chars().enumerate() {
+                if cell == '#' {
+                    trees.push((x, y));
+                }
+            }
+        }
+    }
+
+    Ok(Slope {
+        trees: trees.into_iter().collect(),
+        length: BufReader::new(File::open("input.txt")?).lines().count(),
+        repeat_at: BufReader::new(File::open("input.txt")?)
+            .lines()
+            .next()
+            .unwrap()
+            .unwrap()
+            .len(),
+    })
 }
 
 #[cfg(test)]
@@ -88,7 +119,7 @@ mod tests {
             .into_iter()
             .collect(),
             length: 11,
-            repeat_at: 11
+            repeat_at: 11,
         };
 
         assert_eq!(7, solve_part1(input, 3, 1));
