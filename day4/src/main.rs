@@ -12,20 +12,24 @@ fn main() -> Result<(), Box<dyn std::error::Error + 'static>> {
 fn solve_part1(input: &str) -> usize {
     let mut out = 0;
 
-    let required_parts: HashSet<&str> = vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
-        .into_iter()
-        .collect();
-
     for passport in input.split("\n\n") {
-        let provided_parts: HashSet<&str> = passport
-            .split_whitespace()
-            .map(|part| part.split(':').next().unwrap())
-            .collect();
-
-        if required_parts.is_subset(&provided_parts) {
+        if passport_contains_required_fields(&passport) {
             out += 1;
         }
     }
 
     out
+}
+
+fn passport_contains_required_fields(passport: &str) -> bool {
+    let required_parts: HashSet<&str> = vec!["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
+        .into_iter()
+        .collect();
+
+    let provided_parts: HashSet<&str> = passport
+        .split_whitespace()
+        .map(|part| part.split(':').next().unwrap())
+        .collect();
+
+    required_parts.is_subset(&provided_parts)
 }
