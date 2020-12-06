@@ -1,17 +1,17 @@
 require "set"
 
-total_answers = 0
-group_answers = Set.new
+total_answered_by_anyone = 0
+any_member_answered = Set.new
 File.foreach("input.txt") { |line|
     if line == "\n"
-        total_answers += group_answers.length
-        group_answers.clear
+        total_answered_by_anyone += any_member_answered.length
+        any_member_answered.clear
         next
     end
 
-    group_answers.merge(line.strip.split(""))
+    any_member_answered.merge(line.strip.split(""))
 }
 
-total_answers += group_answers.length
+total_answered_by_anyone += any_member_answered.length
 
-puts total_answers
+puts total_answered_by_anyone
