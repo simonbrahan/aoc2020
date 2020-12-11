@@ -21,7 +21,7 @@ def num_neighbours(input, x, y)
     return out
 end
 
-def process_seat(input, x, y)
+def process_by_neighbours(input, x, y)
     if input[y][x] == "."
         return "."
     end
@@ -37,10 +37,10 @@ def process_seat(input, x, y)
     return input[y][x]
 end
 
-def process_seats(input)
+def process_seats(input, seat_func)
     return input.each_with_index.map do |row, y|
         row.each_with_index.map do |seat, x|
-            process_seat(input, x, y)
+            method(seat_func).call(input, x, y)
         end
     end
 end
@@ -55,7 +55,7 @@ def solve_part1(input)
     loop do
         prev = seats
 
-        seats = process_seats(seats)
+        seats = process_seats(seats, :process_by_neighbours)
 
         if prev == seats
             break
