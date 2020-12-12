@@ -22,26 +22,30 @@ def new_pos(current_pos, dir, num)
     return [current_pos[0] + dirmod[0] * num, current_pos[1] + dirmod[1] * num]
 end
 
-boat_pos = [0, 0]
-boat_dir = "E"
+def solve_part1(input)
+    boat_pos = [0, 0]
+    boat_dir = "E"
 
-for cmd in input
-    case cmd[:cmd]
-    when "N"
-        boat_pos[1] += cmd[:num]
-    when "S"
-        boat_pos[1] -= cmd[:num]
-    when "E"
-        boat_pos[0] += cmd[:num]
-    when "W"
-        boat_pos[0] -= cmd[:num]
-    when "L"
-        boat_dir = new_dir(boat_dir, -cmd[:num])
-    when "R"
-        boat_dir = new_dir(boat_dir, cmd[:num])
-    when "F"
-        boat_pos = new_pos(boat_pos, boat_dir, cmd[:num])
+    for cmd in input
+        case cmd[:cmd]
+        when "N"
+            boat_pos[1] += cmd[:num]
+        when "S"
+            boat_pos[1] -= cmd[:num]
+        when "E"
+            boat_pos[0] += cmd[:num]
+        when "W"
+            boat_pos[0] -= cmd[:num]
+        when "L"
+            boat_dir = new_dir(boat_dir, -cmd[:num])
+        when "R"
+            boat_dir = new_dir(boat_dir, cmd[:num])
+        when "F"
+            boat_pos = new_pos(boat_pos, boat_dir, cmd[:num])
+        end
     end
+
+    return boat_pos[0].abs + boat_pos[1].abs
 end
 
-puts boat_pos[0].abs + boat_pos[1].abs
+puts solve_part1(input)
