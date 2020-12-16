@@ -3,13 +3,15 @@ field_validation_input, my_ticket_input, nearby_tickets_input = File.read("input
     .map { |part| part.split("\n") }
 
 def field_validation_from_input(input)
-    return input.map do |line|
+    out = {}
+
+    for line in input
         field, limits = line.split(": ")
-        next {
-            :field => field,
-            :limits => limits.split(" or ").map { |range| range.split("-").map { |num| num.to_i } }
-        }
+        out[field] = limits.split(" or ").map { |range| range.split("-").map { |num| num.to_i } }
+
     end
+
+    return out
 end
 
 def nearby_tickets_from_input(input)
@@ -21,8 +23,8 @@ def nearby_tickets_from_input(input)
 end
 
 def value_is_valid(num, validations)
-    for validation in validations
-        for start, finish in validation[:limits]
+    for field, ranges in validations.to_a
+        for start, finish in ranges
             if num >= start && num <= finish
                 return true
             end
