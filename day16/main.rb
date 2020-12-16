@@ -68,13 +68,9 @@ def ticket_is_valid(ticket, validations)
     return true
 end
 
-def might_work(validations, tickets, candidate_order)
-    # previous fields have already been tested, so just test the last one
-    latest_field = candidate_order[-1]
-    field_idx = candidate_order.length - 1
-
+def column_is_valid(tickets, column, ranges)
     for ticket in tickets
-        if !value_is_valid(ticket[field_idx], validations[latest_field])
+        if !value_is_valid(ticket[column], ranges)
             return false
         end
     end
@@ -82,28 +78,41 @@ def might_work(validations, tickets, candidate_order)
     return true
 end
 
-def next_candidates(candidate_order, field_names)
-    remaining_fields = field_names.reject { |field| candidate_order.include?(field) }
+def field_matching_single_rule(tickets, fields, exclude_columns, exclude_fields)
+    columns_to_check = (0..tickets[0].length).reject { |num| exclude_columns.include?(num) }
+    fields_to_check = fields.reject { |field, ranges| exclude_fields.include?(field) }
 
-    return remaining_fields.map { |field| candidate_order + [field] }
-end
-
-def get_field_order(validations, tickets)
-    field_names = validations.keys
-
-    candidates = field_names.map { |field_name| [field_name] }
-
-    while candidate = candidates.shift
-        if might_work(validations, tickets, candidate)
-            if candidate.length == validations.length
-                return candidate
+    for column in columns_to_check
+        matching_rules_count = 0
+        for field, ranges in fields_to_check.to_a
+            if column_is_valid(tickets, column, ranges)
+                matching_rules_count += 1
+                matching_field = field
             end
+        end
 
-            candidates += next_candidates(candidate, field_names)
+        if matching_rules_count == 1
+            return [matching_field, column]
         end
     end
 
     return nil
+end
+
+def get_field_order(validations, tickets)
+    field_names = validations.keys
+    field_names_by_position = {}
+    matched_columns = []
+    matched_fields = []
+
+    while field_names_by_position.length < validations.length
+        field_name, idx = field_matching_single_rule(tickets, validations, matched_columns, matched_fields)
+        field_names_by_position[idx] = field_name
+        matched_columns.append(idx)
+        matched_fields.append(field_name)
+    end
+
+    return field_names_by_position.to_a.sort_by { |field| field[0] }.map { |field| field[1] }
 end
 
 def solve_part1(field_validation, nearby_tickets)
@@ -123,9 +132,7 @@ def solve_part2(field_validation, nearby_tickets, my_ticket)
 
     labelled_ticket = Hash[field_order.zip(my_ticket)]
 
-    puts labelled_ticket
-
-    return 0
+    return labelled_ticket.select { |field, val| field.start_with?("departure") }.values.reduce(:*)
 end
 
 field_validation = field_validation_from_input(field_validation_input)
