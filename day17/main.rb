@@ -6,22 +6,6 @@ def new_grid(default_cell_val, dimensions)
     return Hash.new { |h, k| h[k] = new_grid(default_cell_val, dimensions - 1) }
 end
 
-def get_keys(hash)
-  ( hash.keys + hash.values.grep(Hash){|sub_hash| get_keys(sub_hash) } ).flatten
-end
-
-def print_grid(grid)
-    start = get_keys(grid).min
-    finish = get_keys(grid).max
-
-    for z in (start..finish)
-        puts z
-        for y in (start..finish)
-            puts (start..finish).map { |x| grid[z][y][x] || " " }.join(" ") + " -- " + y.to_s
-        end
-    end
-end
-
 def dir_mods(num_dimensions)
     mods = [-1, 0, 1]
 
