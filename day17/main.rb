@@ -64,6 +64,26 @@ def neighbour_counts_3d(grid)
     return out
 end
 
+def neighbour_counts_4d(grid)
+    out = new_grid(0, 4)
+
+    for gw, zone in grid.to_a
+        for gz, layer in zone.to_a
+            for gy, row in layer.to_a
+                for gx, cell in row.to_a
+                    if cell == "#"
+                        for nw, nz, ny, nx in neighbours(gw, gz, gy, gx)
+                            out[nw][nz][ny][nx] += 1
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return out
+end
+
 def grid_from_neighbour_counts_3d(grid, counts)
     out = new_grid(".", 3)
 
@@ -81,6 +101,34 @@ def grid_from_neighbour_counts_3d(grid, counts)
                         out[z][y][x] = "#"
                     else
                         out[z][y][x] = "."
+                    end
+                end
+            end
+        end
+    end
+
+    return out
+end
+
+def grid_from_neighbour_counts_4d(grid, counts)
+    out = new_grid(".", 4)
+
+    for w, zone in counts.to_a
+        for z, layer in zone.to_a
+            for y, row in layer.to_a
+                for x, cell_neighbour_count in row.to_a
+                    if grid[w][z][y][x] == "#"
+                        if [2, 3].include?(cell_neighbour_count)
+                            out[w][z][y][x] = "#"
+                        else
+                            out[w][z][y][x] = "."
+                        end
+                    else
+                        if cell_neighbour_count == 3
+                            out[w][z][y][x] = "#"
+                        else
+                            out[w][z][y][x] = "."
+                        end
                     end
                 end
             end
@@ -127,3 +175,4 @@ def solve_part2()
 end
 
 puts solve_part1()
+puts solve_part2()
