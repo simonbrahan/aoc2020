@@ -53,7 +53,7 @@ def count_in_grid(grid, cell_val)
     return out
 end
 
-def neighbour_counts(grid)
+def neighbour_counts_3d(grid)
     out = new_grid(0, 3)
 
     for gz, layer in grid.to_a
@@ -71,7 +71,7 @@ def neighbour_counts(grid)
     return out
 end
 
-def grid_from_neighbour_counts(grid, counts)
+def grid_from_neighbour_counts_3d(grid, counts)
     out = new_grid(".", 3)
 
     for z, layer in counts.to_a
@@ -107,7 +107,7 @@ def solve_part1()
     end
 
     for i in (1..6)
-        next_grid = grid_from_neighbour_counts(grid, neighbour_counts(grid))
+        next_grid = grid_from_neighbour_counts_3d(grid, neighbour_counts_3d(grid))
 
         grid = next_grid
     end
