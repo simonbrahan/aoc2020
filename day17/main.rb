@@ -1,5 +1,9 @@
-def new_grid(default_cell_val)
-    return Hash.new { |h, k| h[k] = Hash.new { |h, k| h[k] = Hash.new { |h, k| h[k] = default_cell_val } } }
+def new_grid(default_cell_val, dimensions)
+    if dimensions == 1
+        return Hash.new { |h, k| h[k] = default_cell_val }
+    end
+
+    return Hash.new { |h, k| h[k] = new_grid(default_cell_val, dimensions - 1) }
 end
 
 def get_keys(hash)
@@ -18,18 +22,17 @@ def print_grid(grid)
     end
 end
 
-def neighbours(z, y, x)
+def dir_mods(num_dimensions)
+    mods = [-1, 0, 1]
+
+    return [-1, 0, 1].repeated_permutation(num_dimensions).reject { |pos| pos == [0] * num_dimensions }
+end
+
+def neighbours(*args)
     out = []
 
-    mods = [
-        [-1, -1, -1], [-1, -1, 0], [-1, -1, 1], [-1, 0, -1], [-1, 0, 0], [-1, 0, 1],
-        [-1, 1, -1], [-1, 1, 0], [-1, 1, 1], [0, -1, -1], [0, -1, 0], [0, -1, 1],
-        [0, 0, -1], [0, 0, 1], [0, 1, -1], [0, 1, 0], [0, 1, 1], [1, -1, -1], [1, -1, 0],
-        [1, -1, 1], [1, 0, -1], [1, 0, 0], [1, 0, 1], [1, 1, -1], [1, 1, 0], [1, 1, 1]
-    ]
-
-    for zmod, ymod, xmod in mods
-        out.append([z + zmod, y + ymod, x + xmod])
+    for dir_parts in dir_mods(args.length)
+        out.append(args.zip(dir_parts).map { |dir| dir.sum })
     end
 
     return out
@@ -51,7 +54,7 @@ def count_in_grid(grid, cell_val)
 end
 
 def neighbour_counts(grid)
-    out = new_grid(0)
+    out = new_grid(0, 3)
 
     for gz, layer in grid.to_a
         for gy, row in layer.to_a
@@ -69,7 +72,7 @@ def neighbour_counts(grid)
 end
 
 def grid_from_neighbour_counts(grid, counts)
-    out = new_grid(".")
+    out = new_grid(".", 3)
 
     for z, layer in counts.to_a
         for y, row in layer.to_a
@@ -106,7 +109,7 @@ def solve_part1(grid)
     return count_in_grid(current_grid, "#")
 end
 
-input = new_grid(".")
+input = new_grid(".", 3)
 
 for line, y in File.readlines("input.txt", chomp: true).each_with_index
     for char, x in line.split("").each_with_index
