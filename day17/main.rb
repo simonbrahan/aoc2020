@@ -39,18 +39,11 @@ def neighbours(*args)
 end
 
 def count_in_grid(grid, cell_val)
-    out = 0
-    for layer in grid.values
-        for row in layer.values
-            for cell in row.values
-                if cell == cell_val
-                    out += 1
-                end
-            end
-        end
+    if !grid.is_a?(Hash)
+        return grid == cell_val ? 1 : 0
     end
 
-    return out
+    return grid.values.map { |subgrid| count_in_grid(subgrid, cell_val) }.sum
 end
 
 def neighbour_counts_3d(grid)
@@ -108,6 +101,24 @@ def solve_part1()
 
     for i in (1..6)
         next_grid = grid_from_neighbour_counts_3d(grid, neighbour_counts_3d(grid))
+
+        grid = next_grid
+    end
+
+    return count_in_grid(grid, "#")
+end
+
+def solve_part2()
+    grid = new_grid(".", 4)
+
+    for line, y in File.readlines("input.txt", chomp: true).each_with_index
+        for char, x in line.split("").each_with_index
+            grid[0][0][y][x] = char
+        end
+    end
+
+    for i in (1..6)
+        next_grid = grid_from_neighbour_counts_4d(grid, neighbour_counts_4d(grid))
 
         grid = next_grid
     end
