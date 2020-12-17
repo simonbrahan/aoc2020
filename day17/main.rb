@@ -97,24 +97,22 @@ def grid_from_neighbour_counts(grid, counts)
     return out
 end
 
-def solve_part1(grid)
-    current_grid = grid.clone
+def solve_part1()
+    grid = new_grid(".", 3)
+
+    for line, y in File.readlines("input.txt", chomp: true).each_with_index
+        for char, x in line.split("").each_with_index
+            grid[0][y][x] = char
+        end
+    end
 
     for i in (1..6)
-        next_grid = grid_from_neighbour_counts(current_grid, neighbour_counts(current_grid))
+        next_grid = grid_from_neighbour_counts(grid, neighbour_counts(grid))
 
-        current_grid = next_grid
+        grid = next_grid
     end
 
-    return count_in_grid(current_grid, "#")
+    return count_in_grid(grid, "#")
 end
 
-input = new_grid(".", 3)
-
-for line, y in File.readlines("input.txt", chomp: true).each_with_index
-    for char, x in line.split("").each_with_index
-        input[0][y][x] = char
-    end
-end
-
-puts solve_part1(input)
+puts solve_part1()
