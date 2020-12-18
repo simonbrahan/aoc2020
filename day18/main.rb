@@ -7,73 +7,75 @@ tests = [
     ["((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2", 13632]
 ]
 
-def char_is_numeric(char)
-    return ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].include?(char)
+def is_int(token)
+    return token.is_a? Integer
 end
 
-def next_subexpr(expr)
-    idx = 0
-    paren_count = 0
+def lex(expr)
+    return expr.gsub("(", "( ").gsub(")", " )").split.map do |token|
+        maybe_num = token.to_i
 
-    loop do
-        if expr[idx] == "("
-            paren_count += 1
+        if maybe_num.to_s == token
+            next maybe_num
+        else
+            next token
         end
-
-        if expr[idx] == ")"
-            paren_count -= 1
-        end
-
-        break if paren_count == 0
-
-        idx += 1
     end
-
-    return [solve(expr[1...idx]), expr[idx+1..]]
 end
 
-def next_part(expr)
-    if !expr || expr.empty?
-        return [nil, nil]
+def parse(expr)
+    out = []
+    opstack = []
+
+    for token in lex(expr)
+        if is_int(token)
+            out.append(token)
+        end
+
+        if ["*", "+"].include?(token)
+            while opstack.last && opstack.last != "("
+                out.append(opstack.pop)
+            end
+
+            opstack.append(token)
+        end
+
+        if token == "("
+            opstack.append("(")
+        end
+
+        if token == ")"
+            while op = opstack.pop
+                if op == "("
+                    break
+                end
+
+                out.append(op)
+            end
+        end
     end
 
-    if expr[0] == "("
-        return next_subexpr(expr)
+    while op = opstack.pop
+        out.append(op)
     end
 
-    if ["+", "*"].include?(expr[0])
-        return [expr[0], expr[1..-1]]
-    end
-
-    idx = 0
-    while char_is_numeric(expr[idx])
-        idx += 1
-    end
-
-    return [expr[0...idx].to_i, expr[idx..]]
+    return out
 end
 
 def solve(expr)
-    expr.gsub!(/\s+/, "")
+    stack = []
 
-    acc, expr = next_part(expr)
-
-    loop do
-        op, expr = next_part(expr)
-        num, expr = next_part(expr)
-
-        if !op
-            break
-        end
-
-        if op == "+"
-            acc += num
+    for token in parse(expr)
+        if token == "*"
+            stack.append(stack.pop * stack.pop)
+        elsif token == "+"
+            stack.append(stack.pop + stack.pop)
         else
-            acc *= num
+            stack.append(token)
         end
     end
 
-    return acc
+    return stack.pop
 end
 
 for expr, expect in tests
