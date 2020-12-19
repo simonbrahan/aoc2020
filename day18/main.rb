@@ -23,7 +23,7 @@ def lex(expr)
     end
 end
 
-def parse(expr)
+def to_postfix(expr)
     out = []
     opstack = []
 
@@ -65,7 +65,7 @@ end
 def solve(expr)
     stack = []
 
-    for token in parse(expr)
+    for token in to_postfix(expr)
         if token == "*"
             stack.append(stack.pop * stack.pop)
         elsif token == "+"
