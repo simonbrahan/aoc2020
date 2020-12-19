@@ -1,10 +1,15 @@
 tests = [
-    ["1 + 2 * 3 + 4 * 5 + 6", 71],
-    ["1 + (2 * 3) + (4 * (5 + 6))", 51],
-    ["2 * 3 + (4 * 5)", 26],
-    ["5 + (8 * 3 + 9 + 3 * 4 * 3)", 437],
-    ["5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))", 12240],
-    ["((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2", 13632]
+    ["1 + 2 * 3 + 4 * 5 + 6", [], 71],
+    ["1 + (2 * 3) + (4 * (5 + 6))", [], 51],
+    ["2 * 3 + (4 * 5)", [], 26],
+    ["5 + (8 * 3 + 9 + 3 * 4 * 3)", [], 437],
+    ["5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))", [], 12240],
+    ["((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2", [], 13632],
+    ["1 + (2 * 3) + (4 * (5 + 6))", ["+", "*"], 51],
+    ["2 * 3 + (4 * 5)", ["+", "*"], 46],
+    ["5 + (8 * 3 + 9 + 3 * 4 * 3)", ["+", "*"], 1445],
+    ["5 * 9 * (7 * 3 * 3 + 9 * 3 + (8 + 6 * 4))", ["+", "*"], 669060],
+    ["((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2", ["+", "*"], 23340]
 ]
 
 def is_int(token)
@@ -23,7 +28,7 @@ def lex(expr)
     end
 end
 
-def to_postfix(expr)
+def to_postfix(expr, precedence = [])
     out = []
     opstack = []
 
@@ -33,7 +38,10 @@ def to_postfix(expr)
         end
 
         if ["*", "+"].include?(token)
-            while opstack.last && opstack.last != "("
+            while opstack.last &&
+                opstack.last != "(" &&
+                (precedence.empty? || precedence.index(opstack.last) <= precedence.index(token))
+
                 out.append(opstack.pop)
             end
 
@@ -62,10 +70,10 @@ def to_postfix(expr)
     return out
 end
 
-def solve(expr)
+def solve(expr, precedence = [])
     stack = []
 
-    for token in to_postfix(expr)
+    for token in to_postfix(expr, precedence)
         if token == "*"
             stack.append(stack.pop * stack.pop)
         elsif token == "+"
@@ -86,6 +94,11 @@ def solve_part1(input)
     return input.map { |expr| solve(expr) }.sum
 end
 
+def solve_part2(input)
+    return input.map { |expr| solve(expr, ["+", "*"]) }.sum
+end
+
 input = File.readlines("input.txt").map { |line| line.strip }
 
 puts solve_part1(input)
+puts solve_part2(input)
